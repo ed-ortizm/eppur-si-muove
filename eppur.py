@@ -19,19 +19,25 @@ data.info
 # http://learn.astropy.org/rst-tutorials/Coordinates-Transform.html
 # create a SkyCoord() object from the right ascension and the declination.
 # coordinates: ICRS(Ra,Dec), the default frame
-ra = data['ra']
-dec = data['dec']
-coord = SkyCoord(ra,dec)
-gal_coor = coord.galactic
+#ra = data['ra']
+#dec = data['dec']
+#coord = SkyCoord(ra,dec)
+#gal_coor = coord.galactic
 # wrapping angle
-gal_coor.data.lon.wrap_angle = 180. * u.degree
+#gal_coor.data.lon.wrap_angle = 180. * u.degree
 
 # https://matplotlib.org/gallery/subplots_axes_and_figures/geo_demo.html
-plt.figure()
-plt.subplot(111, projection="aitoff")
-plt.title("Aitoff")
-plt.grid(True)
+#plt.figure()
+#plt.subplot(111, projection="aitoff")
+#plt.title("Aitoff")
+#plt.grid(True)
 # s:The marker size in points**2
 # alpha: The alpha blending value, between 0 (transparent) and 1 (opaque).
-plt.scatter(gal_coor.data.lon.radian, gal_coor.data.lat.radian,marker='*', s=1., alpha=0.05)
-plt.show()
+#plt.scatter(gal_coor.data.lon.radian, gal_coor.data.lat.radian,marker='*', s=1., alpha=0.05)
+#plt.show()
+
+# Radial velocity
+# sort method updates the table --> .sort??: Sort the table according to one or
+# more keys. This operates on the existing table and does not return a new table.
+data.sort('phot_g_mean_mag')
+# The data is sorted but there are missing values
