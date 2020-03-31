@@ -39,5 +39,12 @@ data.info
 # Radial velocity
 # sort method updates the table --> .sort??: Sort the table according to one or
 # more keys. This operates on the existing table and does not return a new table.
-data.sort('phot_g_mean_mag')
+data.sort('phot_g_mean_mag')# careful, check mag lower brighter??
 # The data is sorted but there are missing values
+rad_vel = data['radial_velocity']
+# https://docs.astropy.org/en/stable/table/masking.html
+# I'm going to create a mask to exclude missing values.
+# The .mask attribute outputs a True for missing values, to get a True for
+# non missing values I turn to np.logicalnot()
+mask = np.logicalnot(rad_vel.mask)
+data_masked_rad_vel = data[mask]
