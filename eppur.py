@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-
-
 import numpy as np
 import sys
 # Plotting
 import matplotlib
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcol
+#from matplotlib.colors import LinearSegmentedColormap
+import matplotlib.cm as cm
 # Importing from astropy
 # To load the data downloaded from Gaia
 from astropy.table import Table
@@ -56,6 +57,8 @@ rad_vel = data['radial_velocity']
 # non missing values I turn to np.logicalnot()
 mask = np.logical_not(rad_vel.mask)
 data_masked = data[mask][:5000]
+min_vel = np.min(data_masked['radial_velocity'])
+max_vel = np.max(data_masked['radial_velocity'])
 # masks for blue and red shifted stars (it is binary but well)
 blue_shifted_mask = data_masked['radial_velocity'] < 0
 blue_shifted = data_masked[blue_shifted_mask]
@@ -73,6 +76,31 @@ marker='*', s=1., alpha=1,c='blue')
 plt.scatter(red_shifted['Gal longitude'],red_shifted['Gal latitude'] ,\
 marker='*', s=1., alpha=1,c='red')
 plt.show()
+# Now let's do it with a color bar. Actually I found something really cool
+# https://matplotlib.org/3.1.1/gallery/color/custom_cmap.html
+colors = [(0, 0, 1), (1, 0, 0)]  # B -> R
+n_bin = 2  # Discretizes the interpolation into bins
+cmap_name = 'my_list'
+#fig, ax = plt.subplots(1, 1, projection="aitoff"
+#fig.subplots_adjust(left=0.02, bottom=0.06, right=0.95, top=0.94, wspace=0.05)
+# Create the colormap
+my_cm = mcol.LinearSegmentedColormap.from_list(cmap_name, colors, N=n_bin)
+# Fewer bins will result in "coarser" colomap interpolation
+normalize = mcol.Normalize(vmin=min_vel,vmax=max_vel)
+mappable = cm.ScalarMappable(norm=normalize, cmap = my_cm)
+mappable.set_array([])
+#im = ax.imshow(Z, interpolation='nearest', origin='lower', cmap=cm)
+#ax.set_title("N bins: %s" % n_bin)
+#fig.colorbar(im, ax=ax)
+#mappable = cm.ScalarMappable(cmap = cm)
+#mappable.set_array([])
 
+plt.figure()
+plt.subplot(111, projection="aitoff")
+plt.title("Aitoff: radial velocity")
+plt.scatter(data_masked['Gal longitude'],data_masked['Gal latitude'] ,\
+marker='*', s=1., alpha=1,c=mappable.to_rgba(data_masked['radial_velocity']))
+plt.colorbar(mappable)
 # The Sun has an apparent magnitude of −27
 # https://matplotlib.org/3.1.0/tutorials/colors/colorbar_only.html
+plt.show()
