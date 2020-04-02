@@ -48,3 +48,4 @@ rad_vel = data['radial_velocity']
 # non missing values I turn to np.logicalnot()
 mask = np.logicalnot(rad_vel.mask)
 data_masked_rad_vel = data[mask]
+# https://matplotlib.org/3.1.0/tutorials/colors/colorbar_only.html
