@@ -67,21 +67,26 @@ max_vel = np.max(data_masked['radial_velocity'])
 # https://stackoverflow.com/questions/25748183/python-making-color-bar-that-runs-from-red-to-blue
 
 # Here I define my color map
-colors = [(0, 0, 1), (1, 0, 0)]  # B -> R
-n_bin = 7  # Discretizes the interpolation into bins
+#colors = [(0, 0, 1), (1, 0, 0)]  # B -> R
+#n_bin = 7  # Discretizes the interpolation into bins
 # Fewer bins will result in "coarser" colomap interpolation
-cmap_name = 'my_list'
-for n_bin in range(2,11):
-    my_cm = mcol.LinearSegmentedColormap.from_list(cmap_name, colors, N=n_bin)
-    normalize = mcol.Normalize(vmin=min_vel,vmax=max_vel)
-    mappable = cm.ScalarMappable(norm=normalize, cmap = my_cm)
-    mappable.set_array([])
-    # Now plotting
-    plt.figure()
-    plt.subplot(111, projection="aitoff")
-    plt.title("Aitoff")
-    plt.scatter(data_masked['Gal longitude'],data_masked['Gal latitude'] ,\
-    marker='*', s=6., alpha=1,c=mappable.to_rgba(data_masked['radial_velocity']))
-    plt.colorbar(mappable, label="radial velocity")
-    plt.savefig("radial_velocity_" + str(n_bin) + ".pdf")
+#cmap_name = 'my_list'
+#for n_bin in range(2,11):
+#    my_cm = mcol.LinearSegmentedColormap.from_list(cmap_name, colors, N=n_bin)
+#    normalize = mcol.Normalize(vmin=min_vel,vmax=max_vel)
+#    mappable = cm.ScalarMappable(norm=normalize, cmap = my_cm)
+#    mappable.set_array([])
+#    # Now plotting
+#    plt.figure()
+#    plt.subplot(111, projection="aitoff")
+#    plt.title("Aitoff")
+#    plt.scatter(data_masked['Gal longitude'],data_masked['Gal latitude'] ,\
+#    marker='*', s=6., alpha=1,c=mappable.to_rgba(data_masked['radial_velocity']))
+#    plt.colorbar(mappable, label="radial velocity")
+#    plt.savefig("radial_velocity_" + str(n_bin) + ".png")
     #plt.show()
+
+## Images showing how the sky will look around some of the famous stars
+# For this, I'll chose the three brightest stars seen from earth
+# http://www.astro.wisc.edu/~dolan/constellations/extra/brightest.html
+# (1: Sirius)(2: Canopus)(3:Rigil Kentaurus)
