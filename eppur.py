@@ -13,7 +13,7 @@ from astropy.table import Table
 from astropy import units as u
 # SkyCoord --> convert coordinates between different references systems
 from astropy.coordinates import SkyCoord
-
+from astropy.coordinates import Angle
 # Aitoff projection ​ in !!galactic coordinates!!.
 data_file = "gaia_data.vot"
 data = Table.read(data_file)
@@ -39,7 +39,6 @@ data['Gal latitude'] = gal_coor.b
 # s:The marker size in points**2
 # alpha: The alpha blending value, between 0 (transparent) and 1 (opaque).
 #plt.scatter(gal_coor.data.lon.radian, gal_coor.data.lat.radian,marker='*', s=1., alpha=0.05)
-#plt.show()
 #plt.savefig("250K_brigtest_gaia_sources.pdf")
 
 ## Radial velocity: it is already computed respect to the sun
@@ -87,6 +86,69 @@ max_vel = np.max(data_masked['radial_velocity'])
     #plt.show()
 
 ## Images showing how the sky will look around some of the famous stars
+# creating the targets
+data_1K = data[:1000]
+# to do the offsets, I'll follow this:
+# https://docs.astropy.org/en/stable/coordinates/matchsep.html
 # For this, I'll chose the three brightest stars seen from earth
 # http://www.astro.wisc.edu/~dolan/constellations/extra/brightest.html
-# (1: Sirius)(2: Canopus)(3:Rigil Kentaurus)
+# http://simbad.u-strasbg.fr/simbad/sim-id?Ident=Sirius
+#(1) Sirius: Gal coord. (ep=J2000) :	227.23028548 -08.89028243
+## Creating Sirius frame of reference
+sirius_lon = Angle(227.23028548*u.degree).wrap_at(180*u.degree)
+sirius_lon = sirius_lon.value *u.degree
+sirius_lat = -08.89028243 *u.degree
+center = SkyCoord(sirius_lon, sirius_lat)
+sirius_frame = center.skyoffset_frame()
+target = SkyCoord(data_1K['Gal longitude'],data_1K['Gal latitude'],frame='galactic')
+target = target.transform_to(sirius_frame)
+data_1K['Sirius l'] = target.lon
+data_1K['Sirius b'] = target.lat
+plt.figure()
+plt.subplot(111, projection="aitoff")
+plt.title("Aitoff")
+plt.grid(True)
+# s:The marker size in points**2
+# alpha: The alpha blending value, between 0 (transparent) and 1 (opaque).
+plt.scatter(data_1K['Sirius l'], data_1K['Sirius b'],marker='*', s=10., alpha=1)
+plt.savefig("1K_brigtest_sources_Sirius.png")
+
+# http://simbad.u-strasbg.fr/simbad/sim-id?Ident=canopus&submit=submit+id
+# (2) Canopus: Gal coord. (ep=J2000) :	261.21209728 -25.29220489
+canopus_lon = Angle(261.21209728*u.degree).wrap_at(180*u.degree)
+canopus_lon = sirius_lon.value *u.degree
+canopus_lat = -25.29220489 *u.degree
+center = SkyCoord(canopus_lon, canopus_lat)
+canopus_frame = center.skyoffset_frame()
+target = SkyCoord(data_1K['Gal longitude'],data_1K['Gal latitude'],frame='galactic')
+target = target.transform_to(canopus_frame)
+data_1K['Canopus l'] = target.lon
+data_1K['Canopus b'] = target.lat
+plt.figure()
+plt.subplot(111, projection="aitoff")
+plt.title("Aitoff")
+plt.grid(True)
+# s:The marker size in points**2
+# alpha: The alpha blending value, between 0 (transparent) and 1 (opaque).
+plt.scatter(data_1K['Canopus l'], data_1K['Canopus b'],marker='*', s=10., alpha=1)
+plt.savefig("1K_brigtest_sources_Canopus.png")
+
+# http://simbad.u-strasbg.fr/simbad/sim-id?Ident=Rigil+Kentaurus&submit=submit+id
+#(3) Rigil Kentaurus: Gal coord. (ep=J2000) :	315.73416514 -00.67965348
+rigil_lon = Angle(315.73416514*u.degree).wrap_at(180*u.degree)
+rigil_lon = sirius_lon.value *u.degree
+rigil_lat = -0.67965348 *u.degree
+center = SkyCoord(rigil_lon, rigil_lat)
+rigil_frame = center.skyoffset_frame()
+target = SkyCoord(data_1K['Gal longitude'],data_1K['Gal latitude'],frame='galactic')
+target = target.transform_to(rigil_frame)
+data_1K['rigil l'] = target.lon
+data_1K['rigil b'] = target.lat
+plt.figure()
+plt.subplot(111, projection="aitoff")
+plt.title("Aitoff")
+plt.grid(True)
+# s:The marker size in points**2
+# alpha: The alpha blending value, between 0 (transparent) and 1 (opaque).
+plt.scatter(data_1K['rigil l'], data_1K['rigil b'],marker='*', s=10., alpha=1)
+plt.savefig("1K_brigtest_sources_Rigil_Kentaurus.png")
