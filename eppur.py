@@ -186,6 +186,7 @@ plt.savefig("1K_brigtest_sources_Rigil_Kentaurus.png")
 # If you want parallaxes to pass through, with negative parallaxes instead
 # becoming NaN, use the `allow_negative=True` argument.
 ## then I'll mask the negative values
+data.sort('phot_g_mean_mag')
 parallax_mask = data['parallax'] > 0
 data_5K = data[parallax_mask][:5000]
 parallax = [data_5K['parallax'][i] for i in range(5000)]*u.mas
@@ -193,7 +194,9 @@ distance = Distance(parallax=parallax)
 # Gaia data is in equatorial system so we pass all to galactic system to use
 # the tutorial
 ra = data_5K['ra']
+ra = [ra[i] for i in range(5000)]*u.degree
 dec = data_5K['dec']
+dec = [dec[i] for i in range(5000)]*u.degree
 pmra = data_5K['pmra']
 pmra = [pmra[i] for i in range(5000)]* u.mas/u.year
 pmdec = data_5K['pmdec']
@@ -207,13 +210,32 @@ data_5K['l'] = gal_coor.l
 data_5K['b'] = gal_coor.b
 data_5K['pm_l_cosb'] = gal_coor.pm_l_cosb
 data_5K['pm_b'] = gal_coor.pm_b
-c = SkyCoord(data_5K['l'],data_5K['b'],)
-pmra : Proper motion in right ascension direction (double, Angular Velocity[mas/year])
-
+c = SkyCoord(data_5K['l'],data_5K['b'], distance = distance,\
+pm_l_cosb=data_5K['pm_l_cosb'],pm_b=data_5K['pm_b'],frame='galactic',\
+obstime=Time('2015-06-24 11:00:00'))
+#pmra : Proper motion in right ascension direction (double, Angular Velocity[mas/year])
 # pmra = Proper motion in right ascension μα*≡μαcosδ of the source in ICRS at the
 # reference epoch ref_epoch. This is the local tangent plane projection of the
 # proper motion vector in the direction of increasing right ascension.
-
 #pmdec : Proper motion in declination direction (double, Angular Velocity[mas/year] )
 #Proper motion in declination μδ of the source at the reference epoch ref_epoch.
 #This is the projection of the proper motion vector in the direction of increasing declination.
+
+## I need 600 frames, 60 frames per second (10 seconds). Therefore a single
+# frame contains 100/6 years --> dt = 100/6 years
+
+#frames = np.linspace(0.,10_000.,600)
+for time in range(601):
+    dt = time*100./6.
+    c_new = c.apply_space_motion(dt= dt * u.year)
+    c_new.data.lon.wrap_angle = 180. * u.degree
+    b = [c_new.b.value[i] for i in range(5000)]
+    l = [c_new.l.value[i] for i in range(5000)]
+    plt.figure()
+    plt.subplot(111, projection="aitoff")
+    plt.title("5K motion 10K years")
+    plt.grid(True)
+    # s:The marker size in points**2
+    # alpha: The alpha blending value, between 0 (transparent) and 1 (opaque).
+    plt.scatter(l,b,marker='*', s=2., alpha=1)
+    plt.savefig(str(time)+"_year_"+ str(dt)[:6]+".png")
