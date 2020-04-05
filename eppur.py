@@ -27,3 +27,25 @@ def aitoff(coordinates,title,s,alpha):
     # alpha: The alpha blending value, between 0 (transparent) and 1 (opaque).
     plt.scatter(coordinates.data.lon.radian, coordinates.data.lat.radian,marker='*', s=s, alpha=alpha)
     plt.savefig(title + ".png")
+
+def aitoff_color_bar(coordinates,values,colors,n_bin,title,label,s,alpha):
+    # https://matplotlib.org/3.1.1/gallery/color/custom_cmap.html
+    # https://stackoverflow.com/questions/25748183/python-making-color-bar-that-runs-from-red-to-blue
+    # Defining the color map
+    #n_bin = 7  # Discretizes the interpolation into bins
+    # Fewer bins will result in "coarser" colomap interpolation
+    cmap_name = 'my_list'
+    #for n_bin in range(2,11):
+    my_cm = mcol.LinearSegmentedColormap.from_list(cmap_name, colors, N=n_bin)
+    vmin,vmax = np.min(values),np.max(values)
+    normalize = mcol.Normalize(vmin=vmin,vmax=vmax)
+    mappable = cm.ScalarMappable(norm=normalize, cmap = my_cm)
+    mappable.set_array([])
+    # Now plotting
+    plt.figure()
+    plt.subplot(111, projection="aitoff")
+    plt.title(title)
+    plt.scatter(coordinates.data.lon.radian,coordinates.data.lat.radian ,\
+    marker='*', s=s, alpha=alpha,c=mappable.to_rgba(values))
+    plt.colorbar(mappable, label=label)
+    plt.savefig( title + "n_bin_" + str(n_bin)+ ".png")
