@@ -12,8 +12,10 @@ from astropy.table import Table
 # To convert the units
 from astropy import units as u
 # SkyCoord --> convert coordinates between different references systems
-from astropy.coordinates import SkyCoord
+from astropy.coordinates import SkyCoord, Distance
 from astropy.coordinates import Angle
+# movie
+from astropy.time import Time
 # Aitoff projection ​ in !!galactic coordinates!!.
 data_file = "gaia_data.vot"
 data = Table.read(data_file)
@@ -174,3 +176,44 @@ plt.savefig("1K_brigtest_sources_Rigil_Kentaurus.png")
 # phot_g_mean_mag : G-band mean magnitude (float, Magnitude[mag])
 # Mean magnitude in the G band. This is computed from the G-band mean
 # flux applying the magnitude zero-point in the Vega scale.
+
+### 10 second movie (at 60 frames per second!) showing how the apparent position
+# of the 5000 brightest stars will change over the next 10000 years
+# https://docs.astropy.org/en/stable/coordinates/apply_space_motion.html
+### Got this error:
+# ValueError: Some parallaxes are negative, which are notinterpretable as
+# distances. See the discussion in this paper: https://arxiv.org/abs/1507.02105 .
+# If you want parallaxes to pass through, with negative parallaxes instead
+# becoming NaN, use the `allow_negative=True` argument.
+## then I'll mask the negative values
+parallax_mask = data['parallax'] > 0
+data_5K = data[parallax_mask][:5000]
+parallax = [data_5K['parallax'][i] for i in range(5000)]*u.mas
+distance = Distance(parallax=parallax)
+# Gaia data is in equatorial system so we pass all to galactic system to use
+# the tutorial
+ra = data_5K['ra']
+dec = data_5K['dec']
+pmra = data_5K['pmra']
+pmra = [pmra[i] for i in range(5000)]* u.mas/u.year
+pmdec = data_5K['pmdec']
+pmdec = [pmdec[i] for i in range(5000)]* u.mas/u.year
+coord = SkyCoord(ra=ra,dec=dec,pm_ra_cosdec=pmra, pm_dec=pmdec)
+gal_coor = coord.galactic
+# wrapping angle
+gal_coor.data.lon.wrap_angle = 180. * u.degree
+# I need to save this info, I'll need it when plotting the velocity map
+data_5K['l'] = gal_coor.l
+data_5K['b'] = gal_coor.b
+data_5K['pm_l_cosb'] = gal_coor.pm_l_cosb
+data_5K['pm_b'] = gal_coor.pm_b
+c = SkyCoord(data_5K['l'],data_5K['b'],)
+pmra : Proper motion in right ascension direction (double, Angular Velocity[mas/year])
+
+# pmra = Proper motion in right ascension μα*≡μαcosδ of the source in ICRS at the
+# reference epoch ref_epoch. This is the local tangent plane projection of the
+# proper motion vector in the direction of increasing right ascension.
+
+#pmdec : Proper motion in declination direction (double, Angular Velocity[mas/year] )
+#Proper motion in declination μδ of the source at the reference epoch ref_epoch.
+#This is the projection of the proper motion vector in the direction of increasing declination.
