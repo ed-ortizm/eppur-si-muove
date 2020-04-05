@@ -88,6 +88,19 @@ max_vel = np.max(data_masked['radial_velocity'])
 ## Images showing how the sky will look around some of the famous stars
 # creating the targets
 data_1K = data[:1000]
+min_mag = np.min(data_1K['phot_g_mean_mag'])
+max_mag = np.max(data_1K['phot_g_mean_mag'])
+
+# Here I define my color map
+colors = [(1, 0, 0), (0, 1, 0),(0, 0, 1)]
+n_bin = 1000  # Discretizes the interpolation into bins
+# Fewer bins will result in "coarser" colomap interpolation
+cmap_name = 'my_list'
+my_cm = mcol.LinearSegmentedColormap.from_list(cmap_name, colors, N=n_bin)
+normalize = mcol.Normalize(vmin=min_mag,vmax=max_mag)
+mappable = cm.ScalarMappable(norm=normalize, cmap = my_cm)
+mappable.set_array([])
+
 # to do the offsets, I'll follow this:
 # https://docs.astropy.org/en/stable/coordinates/matchsep.html
 # For this, I'll chose the three brightest stars seen from earth
@@ -110,7 +123,9 @@ plt.title("Aitoff")
 plt.grid(True)
 # s:The marker size in points**2
 # alpha: The alpha blending value, between 0 (transparent) and 1 (opaque).
-plt.scatter(data_1K['Sirius l'], data_1K['Sirius b'],marker='*', s=10., alpha=1)
+plt.scatter(data_1K['Sirius l'], data_1K['Sirius b'],marker='*',\
+c=mappable.to_rgba(data_1K['phot_g_mean_mag']), s=10., alpha=1)
+plt.colorbar(mappable, label="magnitude")
 plt.savefig("1K_brigtest_sources_Sirius.png")
 
 # http://simbad.u-strasbg.fr/simbad/sim-id?Ident=canopus&submit=submit+id
@@ -130,7 +145,9 @@ plt.title("Aitoff")
 plt.grid(True)
 # s:The marker size in points**2
 # alpha: The alpha blending value, between 0 (transparent) and 1 (opaque).
-plt.scatter(data_1K['Canopus l'], data_1K['Canopus b'],marker='*', s=10., alpha=1)
+plt.scatter(data_1K['Canopus l'], data_1K['Canopus b'],marker='*',\
+c=mappable.to_rgba(data_1K['phot_g_mean_mag']) ,s=10., alpha=1)
+plt.colorbar(mappable, label="magnitude")
 plt.savefig("1K_brigtest_sources_Canopus.png")
 
 # http://simbad.u-strasbg.fr/simbad/sim-id?Ident=Rigil+Kentaurus&submit=submit+id
@@ -150,5 +167,10 @@ plt.title("Aitoff")
 plt.grid(True)
 # s:The marker size in points**2
 # alpha: The alpha blending value, between 0 (transparent) and 1 (opaque).
-plt.scatter(data_1K['rigil l'], data_1K['rigil b'],marker='*', s=10., alpha=1)
+plt.scatter(data_1K['rigil l'], data_1K['rigil b'],marker='*',\
+c=mappable.to_rgba(data_1K['phot_g_mean_mag']), s=10., alpha=1)
+plt.colorbar(mappable, label="magnitude")
 plt.savefig("1K_brigtest_sources_Rigil_Kentaurus.png")
+# phot_g_mean_mag : G-band mean magnitude (float, Magnitude[mag])
+# Mean magnitude in the G band. This is computed from the G-band mean
+# flux applying the magnitude zero-point in the Vega scale.
