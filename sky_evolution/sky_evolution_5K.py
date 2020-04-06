@@ -61,11 +61,3 @@ for time in range(601):
     c_new.data.lon.wrap_angle = 180. * u.degree
     title= f"{time:03}"
     aitoff_color_bar(c_new,values,colors,n_bin,title,label,s=2,alpha=1, evol=True)
-    # b = [c_new.b.value[i] for i in range(5000)]
-    # l = [c_new.l.value[i] for i in range(5000)]
-    # plt.figure()
-    # plt.subplot(111, projection="aitoff")
-    # plt.title("5K motion 10K years")
-    # plt.grid(True)
-    # plt.scatter(l,b,marker='*', s=2., alpha=1)
-    # plt.savefig(f"{time:03}.png")

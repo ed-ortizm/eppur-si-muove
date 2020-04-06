@@ -19,8 +19,12 @@ coord = SkyCoord(ra,dec)
 gal_coor = coord.galactic
 # wrapping angle
 gal_coor.data.lon.wrap_angle = 180. * u.degree
-# I need to save this info, I'll need it when plotting the velocity map
-data['l'] = gal_coor.l
-data['b'] = gal_coor.b
 
-aitoff(coordinates=gal_coor,title='250K brightest soucrces from Gaia',s=1,alpha=0.05)
+aitoff(coordinates=gal_coor,title='250K brightest soucrces from Gaia',s=0.05,alpha=0.05)
+
+# ss = np.linspace(0.,0.5.,10)
+# alphas = np.linspace(0.,1,10)
+# for s in ss:
+#     for alpha in alphas:
+#         title = '250K brightest soucrces from Gaia' + '_s_' + str(s)[:4] + '_alpha_' + str(alpha)[:4]
+#         aitoff(coordinates=gal_coor,title=title,s=s,alpha=alpha)
